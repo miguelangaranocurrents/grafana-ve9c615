@@ -158,6 +158,10 @@ function reduceSeriesToRows(
         const t = guessFieldTypeForField(f);
         if (t) {
           f.type = t;
+          // Reducing text fields can yield numeric-looking strings; a number field must hold numbers
+          if (t === FieldType.number) {
+            f.values = f.values.map((v) => (typeof v === 'string' ? toNumberOrNaN(v) : v));
+          }
         }
       }
     }
@@ -170,6 +174,11 @@ function reduceSeriesToRows(
   }
 
   return mergeResults(processed);
+}
+
+function toNumberOrNaN(v: string): number {
+  const n = Number(v.trim());
+  return v.trim() === '' ? NaN : n;
 }
 
 function getDistinctLabelKeys(frames: DataFrame[]): string[] {

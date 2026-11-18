@@ -758,7 +758,9 @@ function normalizeZone(zone: string | Zone): Zone {
   }
 
   const name = normalizeZoneName(zone);
-  if (name === 'UTC') {
+  // moment-timezone keeps a valid (UTC) moment for zones it has no data for (e.g. Grafana's
+  // internal "default"/"browser" names); luxon would produce an invalid DateTime instead
+  if (name === 'UTC' || (!IANAZone.isValidZone(name) && !findTimeZoneAt(name, Date.now()))) {
     return FixedOffsetZone.instance(0);
   }
 

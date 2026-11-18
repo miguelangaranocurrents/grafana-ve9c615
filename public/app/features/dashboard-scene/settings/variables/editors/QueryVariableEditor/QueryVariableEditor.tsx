@@ -54,7 +54,13 @@ export function QueryVariableEditor({ variable, onRunQuery }: QueryVariableEdito
   const { value: timeRange } = sceneGraph.getTimeRange(variable).useState();
 
   const onRegExChange = (event: React.FormEvent<HTMLTextAreaElement>) => {
-    variable.setState({ regex: event.currentTarget.value });
+    const regex = event.currentTarget.value;
+    if (regex === (variable.state.regex ?? '')) {
+      return;
+    }
+    variable.setState({ regex });
+    // the regex filters the query result, so re-run to refresh the preview of values
+    onRunQuery();
   };
   const onRegexApplyToChange = (event: VariableRegexApplyTo) => {
     variable.setState({ regexApplyTo: event });
